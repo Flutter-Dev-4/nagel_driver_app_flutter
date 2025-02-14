@@ -1,0 +1,28 @@
+import 'package:driver_app/export.dart';
+
+class BookingFailure extends StatelessWidget {
+  const BookingFailure({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+
+    final appLocale = AppLocalizations.of(context)!;
+
+    return Center(
+      child: SingleChildScrollView(
+        child: AlertDialog(
+          backgroundColor: AppColor.white,
+          title: SvgPicture.asset(AppImages.failure),
+          content: Column(
+            spacing: 10.h,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              HeadingText(title: appLocale.bookingCancelled, fontSize: 20.sp, fontWeight: FontWeight.w700, color: AppColor.primaryBlack, textAlign: TextAlign.center,),
+              AppTextRegular(title: appLocale.sorryToInform, fontSize: 16.sp, fontWeight: FontWeight.w400, color: AppColor.primaryBlack, textAlign: TextAlign.center,),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}

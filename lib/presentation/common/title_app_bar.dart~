@@ -1,0 +1,37 @@
+import 'package:driver_app/export.dart';
+
+class TitleAppBar extends StatelessWidget {
+
+  final String title;
+
+  const TitleAppBar({super.key, required this.title});
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        IconButton(
+          padding: EdgeInsets.zero,
+          onPressed: () {
+            Navigator.pop(context);
+          },
+          icon: SvgPicture.asset(
+            AppImages.back,
+            width: 24.w,
+            height: 24.h,
+          ),
+        ),
+        AppTextRegular(
+          title: title,
+          fontSize: 16.sp,
+          fontWeight: FontWeight.w600,
+          color: AppColor.primaryBlack,
+        ),
+        SizedBox(
+          width: 40.w,
+        ),
+      ],
+    );
+  }
+}

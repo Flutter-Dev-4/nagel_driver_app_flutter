@@ -1,0 +1,38 @@
+import 'package:driver_app/export.dart';
+
+class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
+
+  final String title;
+
+  const CustomAppBar({super.key, required this.title});
+
+  @override
+  Widget build(BuildContext context) {
+    return AppBar(
+      elevation: 0,
+      scrolledUnderElevation: 0,
+      backgroundColor: Colors.transparent,
+      leading: IconButton(
+        padding: EdgeInsets.zero,
+        onPressed: () {
+          Navigator.pop(context);
+        },
+        icon: SvgPicture.asset(
+          AppLocalizations.of(context)!.localeName == 'en' ? AppImages.back : AppImages.back2,
+          width: 24.w,
+          height: 24.h,
+        ),
+      ),
+      title: AppTextRegular(
+        title: title,
+        fontSize: 16.sp,
+        fontWeight: FontWeight.w600,
+        color: AppColor.primaryBlack,
+      ),
+      centerTitle: true,
+    );
+  }
+
+  @override
+  Size get preferredSize => const Size.fromHeight(kToolbarHeight);
+}
