@@ -22,14 +22,17 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
               spacing: 20.h,
               children: [
                 PrefixTextField(
+                    controller: TextEditingController(),
                     obscureText: true,
                     svgPath: AppImages.changePasswordLock,
                     hintText: appLocale.oldPassword),
                 PrefixTextField(
+                    controller: TextEditingController(),
                     obscureText: true,
                     svgPath: AppImages.changePasswordLock,
                     hintText: appLocale.newPassword),
                 PrefixTextField(
+                    controller: TextEditingController(),
                     obscureText: true,
                     svgPath: AppImages.changePasswordLock,
                     hintText: appLocale.confirmPassword),

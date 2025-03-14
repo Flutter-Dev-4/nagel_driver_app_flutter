@@ -41,6 +41,13 @@ extension PaddingExtension on Widget {
       child: this,
     );
   }
+
+  Widget padOnly(double left, double top, double right, double bottom) {
+    return Padding(
+      padding: EdgeInsets.only(left: left, top: top, right: right, bottom: bottom),
+      child: this,
+    );
+  }
 }
 
 extension TextExtensionss on String {

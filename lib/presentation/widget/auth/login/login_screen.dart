@@ -1,4 +1,9 @@
 import 'package:driver_app/export.dart';
+import 'package:driver_app/presentation/common/common_dialouge_box.dart';
+import 'package:driver_app/presentation/common/common_snackbar.dart';
+import 'package:driver_app/presentation/widget/auth/login/controller/login_cubit.dart';
+import 'package:driver_app/presentation/widget/auth/login/controller/login_textfield_controller.dart';
+import 'package:email_validator/email_validator.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -10,6 +15,7 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
 
   bool _canPop = false; // Set this to true to allow navigation back
+  GlobalKey<FormState> _globalKey = GlobalKey<FormState>();
 
   @override
   Widget build(BuildContext context) {
@@ -72,7 +78,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                     borderRadius: BorderRadius.circular(10.r),
                                   ),
                                 ),
-                                onPressed: (){
+                                onPressed: () {
                                   Navigator.pop(context);
                                 },
                                 child: AppTextRegular(
@@ -92,7 +98,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           child: ButtonWidget(
                             loading: false,
                             title: appLocale.yes,
-                            onPress: (){
+                            onPress: () {
                               _canPop = true;
                               SystemNavigator.pop();
                             },
@@ -126,193 +132,233 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
             ),
             SingleChildScrollView(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  140.y,
-                  Stack(
-                    children: [
-                      Center(
-                        child: Container(
-                          width: 370.w,
-                          height: 280.h,
-                          padding: EdgeInsets.symmetric(vertical: 15.h),
-                          decoration: const BoxDecoration(
-                              image: DecorationImage(
-                            image: AssetImage(AppImages.loginPic),
-                            fit: BoxFit.fill,
-                          )),
-                        ),
-                      ),
-                      Column(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Padding(
-                            padding: EdgeInsets.all(15.sp),
-                            child: Align(
-                              alignment: Alignment.centerRight,
-                              child: Container(
-                                padding: EdgeInsets.symmetric(
-                                  horizontal: 16.w,
-                                  vertical: 12.h,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.circular(10.r),
-                                ),
-                                child: Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    SvgPicture.asset(
-                                      AppImages.truck,
-                                      width: 19.w,
-                                      height: 19.h,
-                                    ),
-                                    8.x,
-                                    AppTextRegular(
-                                      title: appLocale.truckArrived,
-                                      fontSize: 14.sp,
-                                      fontWeight: FontWeight.w400,
-                                      color: AppColor.primaryBlack,
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ),
-                          Padding(
-                            padding: EdgeInsets.only(
-                              top: 125.h,
-                              left: 10.w,
-                            ),
-                            child: Align(
-                              alignment: Alignment.centerLeft,
-                              child: Container(
-                                padding: EdgeInsets.symmetric(
-                                    horizontal: 16.w, vertical: 12.h),
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.circular(10.r),
-                                ),
-                                child: Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    SvgPicture.asset(
-                                      AppImages.check,
-                                      width: 19.w,
-                                      height: 19.h,
-                                    ),
-                                    8.x,
-                                    AppTextRegular(
-                                      title: appLocale.moverBookedSuccessfully,
-                                      fontSize: 14.sp,
-                                      fontWeight: FontWeight.w400,
-                                      color: AppColor.primaryBlack,
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                  50.y,
-                  Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 24.w),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.start,
+              child: Form(
+                key: _globalKey,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    140.y,
+                    Stack(
                       children: [
-                        HeadingText(
-                          title: appLocale.helloDriver,
-                          fontSize: 20.sp,
-                          fontWeight: FontWeight.w700,
-                          color: AppColor.primaryBlack,
+                        Center(
+                          child: Container(
+                            width: 370.w,
+                            height: 280.h,
+                            padding: EdgeInsets.symmetric(vertical: 15.h),
+                            decoration: const BoxDecoration(
+                                image: DecorationImage(
+                              image: AssetImage(AppImages.loginPic),
+                              fit: BoxFit.fill,
+                            )),
+                          ),
                         ),
-                        10.y,
-                        AppTextRegular(
-                          title: appLocale.enterYourEmailAndPassword,
-                          fontSize: 16.sp,
-                          fontWeight: FontWeight.w400,
-                          color: AppColor.primaryBlack,
-                        ),
-                        30.y,
-                        PrefixTextField(
-                          obscureText: false,
-                          svgPath: AppImages.email,
-                          hintText: appLocale.email,
-                          keyboardType: TextInputType.emailAddress,
-                        ),
-                        15.y,
-                        const PrefixTextField(
-                          obscureText: true,
-                          svgPath: AppImages.lock,
-                          hintText: '********',
-                        ),
-                        5.y,
-                        Row(
+                        Column(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Expanded(
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  Transform.scale(
-                                    scale: 0.6,
-                                    child: Switch(
-                                      value: true,
-                                      onChanged: (value) {},
-                                      activeTrackColor: AppColor.red,
-                                    ),
-                                  ),
-                                  Expanded(
-                                    child: AppTextRegular(
-                                      title: appLocale.rememberMe,
-                                      fontSize: 16.sp,
-                                      fontWeight: FontWeight.w400,
-                                      color: AppColor.primaryBlack,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            Expanded(
+                            Padding(
+                              padding: EdgeInsets.all(15.sp),
                               child: Align(
                                 alignment: Alignment.centerRight,
-                                child: InkWell(
-                                  onTap: () {
-                                    Navigator.pushNamed(
-                                        context, RoutesNames.forget_email);
-                                  },
-                                  child: AppTextRegular(
-                                    title: appLocale.forgetPassword,
-                                    fontSize: 16.sp,
-                                    fontWeight: FontWeight.w400,
-                                    color: AppColor.primaryBlack,
+                                child: Container(
+                                  padding: EdgeInsets.symmetric(
+                                    horizontal: 16.w,
+                                    vertical: 12.h,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(10.r),
+                                  ),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      SvgPicture.asset(
+                                        AppImages.truck,
+                                        width: 19.w,
+                                        height: 19.h,
+                                      ),
+                                      8.x,
+                                      AppTextRegular(
+                                        title: appLocale.truckArrived,
+                                        fontSize: 14.sp,
+                                        fontWeight: FontWeight.w400,
+                                        color: AppColor.primaryBlack,
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+                            Padding(
+                              padding: EdgeInsets.only(
+                                top: 125.h,
+                                left: 10.w,
+                              ),
+                              child: Align(
+                                alignment: Alignment.centerLeft,
+                                child: Container(
+                                  padding: EdgeInsets.symmetric(
+                                      horizontal: 16.w, vertical: 12.h),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(10.r),
+                                  ),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      SvgPicture.asset(
+                                        AppImages.check,
+                                        width: 19.w,
+                                        height: 19.h,
+                                      ),
+                                      8.x,
+                                      AppTextRegular(
+                                        title: appLocale.moverBookedSuccessfully,
+                                        fontSize: 14.sp,
+                                        fontWeight: FontWeight.w400,
+                                        color: AppColor.primaryBlack,
+                                      ),
+                                    ],
                                   ),
                                 ),
                               ),
                             ),
                           ],
                         ),
-                        20.y,
-                        ButtonWidget(
-                          loading: false,
-                          title: appLocale.login,
-                          onPress: () {
-                            Navigator.pushNamed(context, RoutesNames.home);
-                          },
-                          buttonColor: AppColor.red,
-                          textColor: AppColor.white,
-                        ),
-                        20.y,
                       ],
                     ),
-                  )
-                ],
+                    50.y,
+                    Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 24.w),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          HeadingText(
+                            title: appLocale.helloDriver,
+                            fontSize: 20.sp,
+                            fontWeight: FontWeight.w700,
+                            color: AppColor.primaryBlack,
+                          ),
+                          10.y,
+                          AppTextRegular(
+                            title: appLocale.enterYourEmailAndPassword,
+                            fontSize: 16.sp,
+                            fontWeight: FontWeight.w400,
+                            color: AppColor.primaryBlack,
+                          ),
+                          30.y,
+                          PrefixTextField(
+                            controller: LoginTextfieldController.instance.emailController,
+                            obscureText: false,
+                            svgPath: AppImages.email,
+                            hintText: appLocale.email,
+                            keyboardType: TextInputType.emailAddress,
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Enter email';
+                              }
+                              else if(!EmailValidator.validate(value.trim())){
+                                return 'Invalid Email Address';
+                              }
+                              return null;
+                            },
+                          ),
+                          15.y,
+                          PrefixTextField(
+                            controller: LoginTextfieldController.instance.passwordController,
+                            obscureText: true,
+                            svgPath: AppImages.lock,
+                            hintText: '********',
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Enter password';
+                              }
+                              return null;
+                            },
+                          ),
+                          5.y,
+                          Row(
+                            children: [
+                              Expanded(
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    Transform.scale(
+                                      scale: 0.6,
+                                      child: Switch(
+                                        value: true,
+                                        onChanged: (value) {},
+                                        activeTrackColor: AppColor.red,
+                                      ),
+                                    ),
+                                    Expanded(
+                                      child: AppTextRegular(
+                                        title: appLocale.rememberMe,
+                                        fontSize: 16.sp,
+                                        fontWeight: FontWeight.w400,
+                                        color: AppColor.primaryBlack,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              Expanded(
+                                child: Align(
+                                  alignment: Alignment.centerRight,
+                                  child: InkWell(
+                                    onTap: () {
+                                      Navigator.pushNamed(
+                                          context, RoutesNames.forget_email);
+                                    },
+                                    child: AppTextRegular(
+                                      title: appLocale.forgetPassword,
+                                      fontSize: 16.sp,
+                                      fontWeight: FontWeight.w400,
+                                      color: AppColor.primaryBlack,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          20.y,
+                          BlocConsumer<LoginCubit, LoginState>(
+                            listener: (context, state) {
+                              if(state is LoginLoading){
+                                CommonDialogsBox.showLoadingDialogue(context: context);
+                              }
+                              if(state is LoginError){
+                                Navigator.pop(context);
+                                showCustomSnackBar(context, message: state.error.toString(), type: SnackBarType.error);
+                              }
+                              else if(state is LoginSuccess){
+                                Navigator.pop(context);
+                                showCustomSnackBar(context, message: state.message.toString(), type: SnackBarType.success);
+                                Navigator.pushNamedAndRemoveUntil(context, RoutesNames.home, (route) => false);
+                              }
+                            },
+                            builder: (context, state) {
+                              return ButtonWidget(
+                                loading: false,
+                                title: appLocale.login,
+                                onPress: () {
+                                  if(_globalKey.currentState!.validate()){
+                                    context.read<LoginCubit>().loginUser();
+                                  }
+                                },
+                                buttonColor: AppColor.red,
+                                textColor: AppColor.white,
+                              );
+                            },
+                          ),
+                          20.y,
+                        ],
+                      ),
+                    )
+                  ],
+                ),
               ),
             ),
           ],

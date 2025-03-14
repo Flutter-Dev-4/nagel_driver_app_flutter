@@ -1,4 +1,6 @@
 import 'package:driver_app/export.dart';
+import 'package:driver_app/presentation/common/common_dialouge_box.dart';
+import 'package:driver_app/presentation/widget/profile/controller/get_profile_cubit.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -8,6 +10,14 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    context.read<GetProfileCubit>().getProfile();
+  }
+
   @override
   Widget build(BuildContext context) {
     final appLocale = AppLocalizations.of(context)!;
@@ -18,9 +28,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
         child: Column(
           children: [
             40.y,
-            CircleAvatar(
-              radius: 40.r,
-              backgroundImage: const AssetImage(AppImages.avatar),
+            BlocBuilder<GetProfileCubit, GetProfileState>(
+              builder: (context, state) {
+                return CircleAvatar(
+                  radius: 40.r,
+                  backgroundImage: state is GetProfileSuccess ? NetworkImage(state.getProfileModel.profilePic.toString()) : AssetImage(AppImages.avatar),
+                );
+              },
             ),
             40.y,
             CardWidget(

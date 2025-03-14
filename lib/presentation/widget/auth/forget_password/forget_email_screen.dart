@@ -39,6 +39,7 @@ class _ForgetEmailScreenState extends State<ForgetEmailScreen> {
                   color: AppColor.primaryBlack,
                 ),
                 PrefixTextField(
+                  controller: TextEditingController(),
                     obscureText: false,
                     svgPath: AppImages.email,
                     hintText: appLocale.email),

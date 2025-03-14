@@ -1,11 +1,11 @@
 class AppUrl {
 
-  static const String baseUrl = 'https://hubkw.com/api/v1';
+  static const String baseUrl = 'http://101.46.48.150:4000/api/mobile';
 
-  static const String loginApi = '$baseUrl/login';
+  static const String loginApi = '$baseUrl/auth/login';
 
-  static const String registerApi = '$baseUrl/register';
+  static const String getProfile = '$baseUrl/auth/profile';
 
-  static const String getProfileApi = '$baseUrl/profile';
+  static const String updateProfile = '$baseUrl/auth/update-profile';
 
   }

@@ -38,11 +38,13 @@ class _NewPasswordScreenState extends State<NewPasswordScreen> {
                   color: AppColor.primaryBlack,
                 ),
                 PrefixTextField(
+                  controller: TextEditingController(),
                     obscureText: true,
                     svgPath: AppImages.lock,
                     hintText: '********',
                 ),
                 PrefixTextField(
+                  controller: TextEditingController(),
                   obscureText: true,
                   svgPath: AppImages.lock,
                   hintText: '********',
