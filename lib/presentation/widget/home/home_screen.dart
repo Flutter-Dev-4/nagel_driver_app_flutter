@@ -1,4 +1,9 @@
 import 'package:driver_app/export.dart';
+import 'package:driver_app/presentation/common/common_dialouge_box.dart';
+import 'package:driver_app/presentation/common/common_snackbar.dart';
+import 'package:driver_app/presentation/widget/home/controller/my_orders_cubit.dart';
+import 'package:driver_app/presentation/widget/profile/controller/get_profile_cubit.dart';
+import 'package:lottie/lottie.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -8,14 +13,17 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+
+  @override
+  void initState() {
+    super.initState();
+    context.read<GetProfileCubit>().getProfile();
+    context.read<MyOrdersCubit>().getMyOrders();
+  }
+
   @override
   Widget build(BuildContext context) {
     final appLocale = AppLocalizations.of(context)!;
-    final List<String> status = [
-      appLocale.active,
-      appLocale.assigned,
-      appLocale.assigned
-    ];
 
     return Scaffold(
       body: Padding(
@@ -32,16 +40,27 @@ class _HomeScreenState extends State<HomeScreen> {
                       onTap: () {
                         Navigator.pushNamed(context, RoutesNames.profile);
                       },
-                      child: const CircleAvatar(
-                        backgroundImage: AssetImage(AppImages.avatar),
+                      child: BlocBuilder<GetProfileCubit, GetProfileState>(
+                        builder: (context, state) {
+                          return CircleAvatar(
+                            backgroundImage: state is GetProfileSuccess ? state.getProfileModel.profilePic != null ? NetworkImage(state.getProfileModel.profilePic.toString()) : AssetImage(AppImages.avatar) : AssetImage(AppImages.avatar),
+                          );
+                        },
                       ),
                     ),
                     10.x,
-                    AppTextRegular(
-                      title: appLocale.helloAswadHaider,
-                      fontSize: 16.sp,
-                      fontWeight: FontWeight.w500,
-                      color: AppColor.primaryBlack,
+                    BlocBuilder<GetProfileCubit, GetProfileState>(
+                      builder: (context, state) {
+                        return AppTextRegular(
+                          title: '${appLocale
+                              .hello} ${state is GetProfileSuccess ? state.getProfileModel.firstName != null ? state
+                              .getProfileModel.firstName : '' : ''} ${state is GetProfileSuccess ? state.getProfileModel.lastName != null ? state
+                              .getProfileModel.lastName : '' : ''}',
+                          fontSize: 16.sp,
+                          fontWeight: FontWeight.w500,
+                          color: AppColor.primaryBlack,
+                        );
+                      },
                     ),
                   ],
                 ),
@@ -75,9 +94,21 @@ class _HomeScreenState extends State<HomeScreen> {
               color: AppColor.black20,
             ),
             15.y,
-            ListView.builder(
+            BlocConsumer<MyOrdersCubit, MyOrdersState>(
+                listener: (context, state) {
+                  if(state is MyOrdersLoading){
+                    CommonDialogsBox.showLoadingDialogue(context: context);
+                  }
+                  if(state is MyOrdersError){
+                    showCustomSnackBar(context, message: state.error.toString(), type: SnackBarType.error);
+                  }
+                  else if(state is MyOrdersSuccess){
+                  }
+                },
+                builder: (context, state) {
+                  return state is MyOrdersSuccess ? state.myOrdersList.length != 0 ? ListView.builder(
                 shrinkWrap: true,
-                itemCount: 3,
+                itemCount: state.myOrdersList.length,
                 physics: const NeverScrollableScrollPhysics(),
                 itemBuilder: (context, index) {
                   return Padding(
@@ -104,12 +135,12 @@ class _HomeScreenState extends State<HomeScreen> {
                               ),
                               child: Row(
                                 mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
+                                MainAxisAlignment.spaceBetween,
                                 children: [
                                   Flexible(
                                     flex: 3,
                                     child: AppTextMedium(
-                                      title: appLocale.arrivalBetween,
+                                      title: '${appLocale.arrivalBetween} ${state.myOrdersList[index].arrivalTime.toString()}',
                                       fontSize: 14.sp,
                                       fontWeight: FontWeight.w400,
                                       color: AppColor.primaryBlack,
@@ -118,7 +149,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                   Flexible(
                                     flex: 1,
                                     child: AppTextMedium(
-                                      title: appLocale.eightAugust2024,
+                                      title: state.myOrdersList[index].arrivalDate != null ? state.myOrdersList[index].arrivalDate!.toString() : appLocale.dateNotSelected,
                                       fontSize: 14.sp,
                                       fontWeight: FontWeight.w400,
                                       color: AppColor.primaryBlack,
@@ -134,17 +165,25 @@ class _HomeScreenState extends State<HomeScreen> {
                                 children: [
                                   ListTile(
                                     contentPadding: EdgeInsets.zero,
-                                    leading: const CircleAvatar(
-                                      backgroundImage:
-                                          AssetImage(AppImages.avatar),
+                                    leading: BlocBuilder<GetProfileCubit, GetProfileState>(
+                                      builder: (context, state) {
+                                        return CircleAvatar(
+                                          backgroundImage: state is GetProfileSuccess ? state.getProfileModel.profilePic != null ? NetworkImage(state.getProfileModel.profilePic.toString()) : AssetImage(AppImages.avatar) : AssetImage(AppImages.avatar),
+                                        );
+                                      },
                                     ),
                                     title: Row(
                                       children: [
-                                        AppTextRegular(
-                                          title: appLocale.aqibJavid,
-                                          fontSize: 16.sp,
-                                          fontWeight: FontWeight.w600,
-                                          color: AppColor.primaryBlack,
+                                        BlocBuilder<GetProfileCubit, GetProfileState>(
+                                          builder: (context, state) {
+                                            return AppTextRegular(
+                                              title: '${state is GetProfileSuccess ? state.getProfileModel.firstName != null ? state
+                                                  .getProfileModel.firstName : '' : ''} ${state is GetProfileSuccess ? state.getProfileModel.lastName != null ? state
+                                                  .getProfileModel.lastName : '' : ''}',                                              fontSize: 16.sp,
+                                              fontWeight: FontWeight.w600,
+                                              color: AppColor.primaryBlack,
+                                            );
+                                          },
                                         ),
                                         5.x,
                                         Container(
@@ -153,10 +192,10 @@ class _HomeScreenState extends State<HomeScreen> {
                                           decoration: BoxDecoration(
                                             color: AppColor.red,
                                             borderRadius:
-                                                BorderRadius.circular(40.r),
+                                            BorderRadius.circular(40.r),
                                           ),
                                           child: AppTextRegular(
-                                            title: status[index],
+                                            title: state.myOrdersList[index].status.toString(),
                                             fontSize: 12.sp,
                                             fontWeight: FontWeight.w400,
                                             color: AppColor.white,
@@ -175,7 +214,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                       15.x,
                                       Expanded(
                                         child: AppTextMedium(
-                                          title: appLocale.alAkariaAlOlayah,
+                                          title: state.myOrdersList[index].fromAddress != null ? state.myOrdersList[index].fromAddress.toString() : appLocale.addressNotMentioned,
                                           fontSize: 14.sp,
                                           fontWeight: FontWeight.w400,
                                           color: AppColor.primaryBlack,
@@ -194,7 +233,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                       15.x,
                                       Expanded(
                                         child: AppTextMedium(
-                                          title: appLocale.raihanatAlJazirah,
+                                          title: state.myOrdersList[index].toAddress != null ? state.myOrdersList[index].toAddress.toString() : appLocale.addressNotMentioned,
                                           fontSize: 14.sp,
                                           fontWeight: FontWeight.w400,
                                           color: AppColor.primaryBlack,
@@ -210,7 +249,22 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                     ),
                   );
-                }),
+                }) : Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Lottie.asset(
+                          'assets/images/home/not_found.json',
+                          width: 200.w,
+                          height: 200.h,
+                        ),
+                        AppTextRegular(title: appLocale.noOrdersFound, fontSize: 18.sp, fontWeight: FontWeight.w600, color: AppColor.primaryBlack,),
+                      ],
+                    ),
+                  ) : Container();
+                  },
+            ),
           ],
         ),
       ),

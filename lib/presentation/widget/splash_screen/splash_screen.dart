@@ -1,3 +1,6 @@
+import 'dart:developer';
+
+import 'package:driver_app/data/AppData/data.dart';
 import 'package:driver_app/export.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -13,7 +16,13 @@ class _SplashScreenState extends State<SplashScreen> {
     // TODO: implement initState
     super.initState();
     Timer(const Duration(seconds: 3), () {
-      Navigator.pushNamed(context, RoutesNames.login);
+      log('Here is splash Token ${Data.app.token}');
+      if(Data.app.token != null && Data.app.token != ''){
+        Navigator.pushNamed(context, RoutesNames.home);
+      }
+      else{
+        Navigator.pushNamed(context, RoutesNames.login);
+      }
     });
   }
 

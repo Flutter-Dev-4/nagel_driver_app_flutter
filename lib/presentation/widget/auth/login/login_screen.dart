@@ -256,10 +256,10 @@ class _LoginScreenState extends State<LoginScreen> {
                             keyboardType: TextInputType.emailAddress,
                             validator: (value) {
                               if (value == null || value.isEmpty) {
-                                return 'Enter email';
+                                return appLocale.enterEmail;
                               }
                               else if(!EmailValidator.validate(value.trim())){
-                                return 'Invalid Email Address';
+                                return appLocale.invalidEmail;
                               }
                               return null;
                             },
@@ -272,7 +272,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             hintText: '********',
                             validator: (value) {
                               if (value == null || value.isEmpty) {
-                                return 'Enter password';
+                                return appLocale.enterPassword;
                               }
                               return null;
                             },

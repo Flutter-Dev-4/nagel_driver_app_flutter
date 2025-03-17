@@ -8,4 +8,8 @@ class AppUrl {
 
   static const String updateProfile = '$baseUrl/auth/update-profile';
 
+  static const String changePassword = '$baseUrl/auth/update-password';
+
+  static const String myOrders = '$baseUrl/orders/my-orders';
+
   }

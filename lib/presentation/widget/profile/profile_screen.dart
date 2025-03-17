@@ -1,3 +1,4 @@
+import 'package:driver_app/application/services/SharedPreferences/app_preferences.dart';
 import 'package:driver_app/export.dart';
 import 'package:driver_app/presentation/common/common_dialouge_box.dart';
 import 'package:driver_app/presentation/widget/profile/controller/get_profile_cubit.dart';
@@ -32,7 +33,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               builder: (context, state) {
                 return CircleAvatar(
                   radius: 40.r,
-                  backgroundImage: state is GetProfileSuccess ? NetworkImage(state.getProfileModel.profilePic.toString()) : AssetImage(AppImages.avatar),
+                  backgroundImage: state is GetProfileSuccess ? state.getProfileModel.profilePic != null ? NetworkImage(state.getProfileModel.profilePic.toString()) : AssetImage(AppImages.avatar) : AssetImage(AppImages.avatar),
                 );
               },
             ),
@@ -74,6 +75,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               imagePath: AppImages.logout,
               title: appLocale.logout,
               onPress: () {
+                SharedPrefs.clearUserData();
                 Navigator.pushNamed(context, RoutesNames.login);
               },
             ),

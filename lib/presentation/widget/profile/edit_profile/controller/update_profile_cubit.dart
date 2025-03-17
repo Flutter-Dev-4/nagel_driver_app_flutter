@@ -19,7 +19,8 @@ class UpdateProfileCubit extends Cubit<UpdateProfileState> {
     emit(UpdateProfileLoading());
     profileRepo.updateProfile(
         {
-          "name": ProfileTextFieldController.instance.firstNameController.text,
+          "firstName": ProfileTextFieldController.instance.firstNameController.text,
+          "lastName": ProfileTextFieldController.instance.lastNameController.text,
           "profilePic":"https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?fm=jpg&q=60&w=3000&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8bWFsZSUyMHByb2ZpbGV8ZW58MHx8MHx8fDA%3D"
         }
     ).then((val){
@@ -28,7 +29,7 @@ class UpdateProfileCubit extends Cubit<UpdateProfileState> {
         emit(UpdateProfileSuccess(message: 'Successfully Updated'));
         log('Updated Successfully');
       }else{
-        emit(UpdateProfileError(error: "error"));
+        emit(UpdateProfileError(error: val.data!['errormessage'].toString()));
       }
     });
   }
