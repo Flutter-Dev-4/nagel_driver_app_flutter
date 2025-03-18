@@ -70,4 +70,21 @@ class ProfileRepo {
     }
   }
 
+  Future<ApiResponse> orderHistory() async {
+
+    SharedPrefs.getUserToken();
+
+    try{
+      return await apiService.get(
+        headers: {
+          'authorization': 'Bearer ${Data.app.token}'
+        },
+        url: AppUrl.orderHistory,);
+    }catch(e){
+      return ApiResponse(success: false,
+        error: "${e.toString()}",
+      );
+    }
+  }
+
 }

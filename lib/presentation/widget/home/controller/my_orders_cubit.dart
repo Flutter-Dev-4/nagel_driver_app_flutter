@@ -12,7 +12,6 @@ part 'my_orders_state.dart';
 class MyOrdersCubit extends Cubit<MyOrdersState> {
   MyOrdersCubit() : super(MyOrdersInitial());
 
-
   HomeRepo homeRepo = HomeRepo(apiService: locator<ApiServices>());
 
   Future<void> getMyOrders() async {
@@ -27,8 +26,8 @@ class MyOrdersCubit extends Cubit<MyOrdersState> {
         final ordersData = val.data?['data']?['orders'];
 
         if (ordersData != null && ordersData is List) {
-          List<Orders> getMyOrdersModel =
-          ordersData.map((e) => Orders.fromJson(e)).toList();
+          List<MyOrdersList> getMyOrdersModel =
+          ordersData.map((e) => MyOrdersList.fromJson(e)).toList();
 
           emit(MyOrdersSuccess(myOrdersList: getMyOrdersModel));
         } else {

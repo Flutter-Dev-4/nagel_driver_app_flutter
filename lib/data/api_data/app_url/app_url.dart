@@ -12,4 +12,8 @@ class AppUrl {
 
   static const String myOrders = '$baseUrl/orders/my-orders';
 
+  static const String orderHistory = '$baseUrl/orders/history';
+
+  static const String orderDetail = '$baseUrl/orders/detail/1';
+
   }

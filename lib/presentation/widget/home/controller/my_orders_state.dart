@@ -6,7 +6,7 @@ sealed class MyOrdersState {}
 final class MyOrdersInitial extends MyOrdersState {}
 final class MyOrdersLoading extends MyOrdersState {}
 final class MyOrdersSuccess extends MyOrdersState {
-  final List<Orders> myOrdersList;
+  final List<MyOrdersList> myOrdersList;
   MyOrdersSuccess({required this.myOrdersList});
 }
 final class MyOrdersError extends MyOrdersState {

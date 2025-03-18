@@ -1,13 +1,13 @@
-class GetMyOrdersModel {
-  List<MyOrdersList>? orders;
+class OrderHistoryModel {
+  List<OrderHistory>? orders;
 
-  GetMyOrdersModel({this.orders});
+  OrderHistoryModel({this.orders});
 
-  GetMyOrdersModel.fromJson(Map<String, dynamic> json) {
+  OrderHistoryModel.fromJson(Map<String, dynamic> json) {
     if (json['orders'] != null) {
-      orders = <MyOrdersList>[];
+      orders = <OrderHistory>[];
       json['orders'].forEach((v) {
-        orders!.add(new MyOrdersList.fromJson(v));
+        orders!.add(new OrderHistory.fromJson(v));
       });
     }
   }
@@ -21,7 +21,7 @@ class GetMyOrdersModel {
   }
 }
 
-class MyOrdersList {
+class OrderHistory {
   int? id;
   String? fromAddress;
   String? toAddress;
@@ -30,7 +30,7 @@ class MyOrdersList {
   String? arrivalTime;
   Assignment? assignment;
 
-  MyOrdersList(
+  OrderHistory(
       {this.id,
         this.fromAddress,
         this.toAddress,
@@ -39,7 +39,7 @@ class MyOrdersList {
         this.arrivalTime,
         this.assignment});
 
-  MyOrdersList.fromJson(Map<String, dynamic> json) {
+  OrderHistory.fromJson(Map<String, dynamic> json) {
     id = json['id'];
     fromAddress = json['from_address'];
     toAddress = json['to_address'];

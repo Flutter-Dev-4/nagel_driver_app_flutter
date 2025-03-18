@@ -1,4 +1,5 @@
 import 'package:driver_app/export.dart';
+import 'package:driver_app/presentation/widget/order_detail/controller/order_detail_api_cubit.dart';
 
 class OrderDetailsScreen extends StatefulWidget {
   const OrderDetailsScreen({super.key});
@@ -44,6 +45,7 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
   @override
   void initState() {
     super.initState();
+    context.read<OrderDetailApiCubit>().orderDetail();
     context.read<OrderDetailCubit>().fetchLocation();
     context
         .read<OrderDetailCubit>()
@@ -142,6 +144,8 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
   Widget _pickUpBuildPanel(ScrollController scrollController) {
     final appLocale = AppLocalizations.of(context)!;
 
+    return BlocBuilder<OrderDetailApiCubit, OrderDetailApiState>(
+  builder: (context, state) {
     return Container(
       decoration: BoxDecoration(
         color: Colors.transparent,
@@ -184,20 +188,31 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
                         children: [
                           ListTile(
                               contentPadding: EdgeInsets.zero,
-                              leading: const CircleAvatar(
-                                backgroundImage: AssetImage(AppImages.avatar),
+                              leading: CircleAvatar(
+                                backgroundImage: state is OrderDetailApiSuccess ? state.orderDetailModel.order!.assignment!.driver!.profilePic != null ? NetworkImage(state.orderDetailModel.order!.assignment!.driver!.profilePic.toString()) : AssetImage(AppImages.avatar) : AssetImage(AppImages.avatar),
                               ),
                               title: AppTextRegular(
-                                title: appLocale.aqibJavid,
+                                title: state is OrderDetailApiSuccess ? '${state.orderDetailModel.order!.assignment!.driver!.firstName.toString()} ${state.orderDetailModel.order!.assignment!.driver!.lastName.toString()}' : '',
                                 fontSize: 16.sp,
                                 fontWeight: FontWeight.w600,
                                 color: AppColor.primaryBlack,
                               ),
-                              subtitle: AppTextMedium(
-                                title: appLocale.arrivalBetween,
-                                fontSize: 14.sp,
-                                fontWeight: FontWeight.w400,
-                                color: AppColor.primaryBlack,
+                              subtitle: Row(
+                                children: [
+                                  AppTextMedium(
+                                    title: appLocale.arrivalBetween,
+                                    fontSize: 14.sp,
+                                    fontWeight: FontWeight.w400,
+                                    color: AppColor.primaryBlack,
+                                  ),
+                                  10.x,
+                                  AppTextMedium(
+                                    title: state is OrderDetailApiSuccess ? state.orderDetailModel.order!.arrivalTime.toString() : '',
+                                    fontSize: 14.sp,
+                                    fontWeight: FontWeight.w400,
+                                    color: AppColor.primaryBlack,
+                                  ),
+                                ],
                               )),
                           Row(
                             children: [
@@ -211,7 +226,7 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
                               ),
                               Expanded(
                                 child: AppTextMedium(
-                                  title: appLocale.alAkariaAlOlayah,
+                                  title: state is OrderDetailApiSuccess ? '${state.orderDetailModel.order!.fromFloor.toString()} ${state.orderDetailModel.order!.fromApartment.toString()} ${state.orderDetailModel.order!.fromAddress.toString()}' : '',
                                   fontSize: 14.sp,
                                   fontWeight: FontWeight.w400,
                                   color: AppColor.primaryBlack,
@@ -231,7 +246,7 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
                               ),
                               Expanded(
                                 child: AppTextMedium(
-                                  title: appLocale.raihanatAlJazirah,
+                                  title: state is OrderDetailApiSuccess ? '${state.orderDetailModel.order!.toFloor.toString()} ${state.orderDetailModel.order!.toApartment.toString()} ${state.orderDetailModel.order!.toAddress.toString()}' : '',
                                   fontSize: 14.sp,
                                   fontWeight: FontWeight.w400,
                                   color: AppColor.primaryBlack,
@@ -369,5 +384,7 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
         ],
       ),
     );
+  },
+);
   }
 }

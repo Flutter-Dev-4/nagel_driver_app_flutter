@@ -67,7 +67,7 @@
   "lastName": "Last Name",
   "orderHistory": "Order history",
   "orderID": "Order ID",
-  "status": "Delivered",
+  "status": "Status",
   "delivered": "Delivered",
   "items": "Items",
   "tenBoxes": "10 boxes, 2 sofas",
