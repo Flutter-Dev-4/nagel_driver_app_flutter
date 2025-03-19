@@ -1,4 +1,7 @@
 import 'package:driver_app/export.dart';
+import 'package:driver_app/presentation/common/common_dialouge_box.dart';
+import 'package:driver_app/presentation/common/common_snackbar.dart';
+import 'package:driver_app/presentation/widget/order_detail/controller/move_start_cubit.dart';
 import 'package:driver_app/presentation/widget/order_detail/controller/order_detail_api_cubit.dart';
 
 class OrderDetailsScreen extends StatefulWidget {
@@ -11,6 +14,8 @@ class OrderDetailsScreen extends StatefulWidget {
 class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
   final double latitude = 37.422; // Example latitude
   final double longitude = -122.084; // Example longitude
+
+  final Set<Polyline> polylines = const {};
 
   int currentIndex = 0;
   final String phoneNumber =
@@ -28,10 +33,9 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
     }
   }
 
-  Future<void> _openMap() async {
-    final String googleMapsUrl =
-        'https://www.google.com/maps/search/?api=1&query=$latitude,$longitude';
-    final String appleMapsUrl = 'http://maps.apple.com/?q=$latitude,$longitude';
+  Future<void> _openMap(double lat, double long) async {
+    final String googleMapsUrl = 'https://www.google.com/maps/search/?api=1&query=$lat,$long';
+    final String appleMapsUrl = 'http://maps.apple.com/?q=$lat,$long';
 
     if (await canLaunch(googleMapsUrl)) {
       await launch(googleMapsUrl); // Launch Google Maps
@@ -81,41 +85,44 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
             width: double.infinity,
             child: Stack(
               children: [
-                SizedBox(
+                BlocBuilder<OrderDetailApiCubit, OrderDetailApiState>(
+                  builder: (context, state) {
+                    return SizedBox(
                   height: 370.h,
-                  child: state.isLoading
-                      ? Center(child: CircularProgressIndicator())
-                      : GoogleMap(
-                          zoomControlsEnabled: false,
-                          initialCameraPosition: CameraPosition(
-                            target: cubit.current,
-                            zoom: 12.0,
-                          ),
-                          markers: {
-                            Marker(
-                              markerId: MarkerId("currentLocation"),
-                              position: cubit.current,
-                              infoWindow: InfoWindow(title: "Current Location"),
-                              icon: cubit.currentIcon == null
-                                  ? BitmapDescriptor.defaultMarker
-                                  : cubit.currentIcon!,
-                            ),
-                            if (state.destination != null)
-                              Marker(
-                                markerId: MarkerId("destination"),
-                                position: state.destination!,
-                                infoWindow: InfoWindow(title: "Destination"),
-                                icon: cubit.destinationIcon == null
-                                    ? BitmapDescriptor.defaultMarker
-                                    : cubit.destinationIcon!,
-                              ),
-                          },
-                          polylines: state.polylines,
-                          onMapCreated: (controller) => context
-                              .read<OrderDetailCubit>()
-                              .mapController = controller,
+                  child: state is OrderDetailApiSuccess
+                      ? GoogleMap(
+                    zoomControlsEnabled: false,
+                    initialCameraPosition: CameraPosition(
+                      target: LatLng(state.orderDetailModel.order?.expectedDestinationLatitude != null ? state.orderDetailModel.order?.expectedDestinationLatitude :  0.0, state.orderDetailModel.order?.expectedDestinationLongitude != null ? state.orderDetailModel.order?.expectedDestinationLongitude : 0.0),
+                      zoom: 12.0,
+                    ),
+                    markers: {
+                      Marker(
+                        markerId: MarkerId("currentLocation"),
+                        position: LatLng(state.orderDetailModel.order?.expectedDestinationLatitude != null ? state.orderDetailModel.order?.expectedDestinationLatitude :  0.0, state.orderDetailModel.order?.expectedDestinationLongitude != null ? state.orderDetailModel.order?.expectedDestinationLongitude : 0.0),
+                        infoWindow: InfoWindow(title: "Current Location"),
+                        icon: cubit.currentIcon == null
+                            ? BitmapDescriptor.defaultMarker
+                            : cubit.currentIcon!,
+                      ),
+                        Marker(
+                          markerId: MarkerId("destination"),
+                          position: LatLng(state.orderDetailModel.order?.departureLatitude != null ? state.orderDetailModel.order?.departureLatitude :  0.0, state.orderDetailModel.order?.departureLongitude != null ? state.orderDetailModel.order?.departureLongitude : 0.0),
+                          infoWindow: InfoWindow(title: "Destination"),
+                          icon: cubit.destinationIcon == null
+                              ? BitmapDescriptor.defaultMarker
+                              : cubit.destinationIcon!,
                         ),
-                ),
+                    },
+                    polylines: state.polylines,
+                    onMapCreated: (controller) => context
+                        .read<OrderDetailCubit>()
+                        .mapController = controller,
+                  )
+                      : Center(child: CircularProgressIndicator()),
+                );
+  },
+),
                 Padding(
                   padding: EdgeInsets.only(
                     top: 30.h,
@@ -301,18 +308,38 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
                                     ? appLocale.markAsArrived
                                     : appLocale.moveDelivered,
                             onPress: () {
-
                                 if(currentIndex==0 || currentIndex==1){
                                   showDialog(
                                     context: context,
                                     builder: (context) {
-                                      return StatesDialogueConfirm(
+
+                                      final orderId = state is OrderDetailApiSuccess ? state.orderDetailModel.order!.assignment!.orderId : 0;
+                                      final latitude = state is OrderDetailApiSuccess ? state.orderDetailModel.order!.expectedDestinationLatitude : 0.0;
+                                      final longitude = state is OrderDetailApiSuccess ? state.orderDetailModel.order!.expectedDestinationLongitude : 0.0;
+
+                                      return BlocConsumer<MoveStartCubit, MoveStartState>(
+                                        listener: (context, state) {
+                                          if(state is MoveStartLoading){
+                                            CommonDialogsBox.showLoadingDialogue(context: context);
+                                          }
+                                          if(state is MoveStartError){
+                                            Navigator.pop(context);
+                                            showCustomSnackBar(context, message: state.error.toString(), type: SnackBarType.error);
+                                            Navigator.pop(context);
+                                          }
+                                          else if(state is MoveStartSuccess){
+                                            currentIndex++;
+                                            Navigator.pop(context);
+                                            showCustomSnackBar(context, message: state.message.toString(), type: SnackBarType.success);
+                                          }
+                                        },
+                                        builder: (context, state) {
+                                          return StatesDialogueConfirm(
                                         title: currentIndex == 0 ? appLocale.moveStarted : appLocale.markArrived,
                                         onPress: () {
-                                          setState(() {
-                                            currentIndex++;
-                                          });
-                                          Navigator.pop(context);
+                                          context.read<MoveStartCubit>().moveStart(orderId!, latitude, longitude);
+                                        },
+                                      );
                                         },
                                       );
                                     },
@@ -349,7 +376,9 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
                 InkWell(
-                  onTap: _openMap,
+                  onTap: (){
+                    _openMap(state is OrderDetailApiSuccess ? state.orderDetailModel.order!.departureLatitude : 0.0, state is OrderDetailApiSuccess ? state.orderDetailModel.order!.departureLongitude : 0.0);
+                  },
                   child: CircleAvatar(
                     backgroundColor: AppColor.lightRed,
                     child: Center(
@@ -365,7 +394,7 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
                 ),
                 InkWell(
                   onTap: () {
-                    _makePhoneCall(phoneNumber);
+                    _makePhoneCall(state is OrderDetailApiSuccess ? state.orderDetailModel.order!.customer!.phone.toString() : '1234567890');
                   },
                   child: CircleAvatar(
                     backgroundColor: AppColor.red,

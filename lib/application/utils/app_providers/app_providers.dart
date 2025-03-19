@@ -1,5 +1,8 @@
 import 'package:driver_app/presentation/widget/auth/login/controller/login_cubit.dart';
 import 'package:driver_app/presentation/widget/home/controller/my_orders_cubit.dart';
+import 'package:driver_app/presentation/widget/order_detail/controller/arrived_cubit.dart';
+import 'package:driver_app/presentation/widget/order_detail/controller/delivered_cubit.dart';
+import 'package:driver_app/presentation/widget/order_detail/controller/move_start_cubit.dart';
 import 'package:driver_app/presentation/widget/order_detail/controller/order_detail_api_cubit.dart';
 import 'package:driver_app/presentation/widget/order_detail/controller/order_detail_cubit.dart';
 import 'package:driver_app/presentation/widget/profile/change_language/controller/change_language_cubit.dart';
@@ -20,4 +23,7 @@ List<BlocProvider> appProviders = [
   BlocProvider<MyOrdersCubit>(create: (context) => MyOrdersCubit()),
   BlocProvider<OrderHistoryCubit>(create: (context) => OrderHistoryCubit()),
   BlocProvider<OrderDetailApiCubit>(create: (context) => OrderDetailApiCubit()),
+  BlocProvider<MoveStartCubit>(create: (context) => MoveStartCubit()),
+  BlocProvider<ArrivedCubit>(create: (context) => ArrivedCubit()),
+  BlocProvider<DeliveredCubit>(create: (context) => DeliveredCubit()),
 ];

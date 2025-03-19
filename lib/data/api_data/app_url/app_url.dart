@@ -16,4 +16,10 @@ class AppUrl {
 
   static const String orderDetail = '$baseUrl/orders/detail/1';
 
+  static const String moveStart = '$baseUrl/orders/start-move';
+
+  static const String arrived = '$baseUrl/orders/arrived';
+
+  static const String delivered = '$baseUrl/orders/delivered';
+
   }

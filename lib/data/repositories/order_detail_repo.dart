@@ -27,4 +27,59 @@ class OrderDetailRepo {
       );
     }
   }
+
+  Future<ApiResponse> moveStart(Map<String, dynamic> body) async {
+    SharedPrefs.getUserToken();
+    print("The body Data ${body.toString()}");
+    try{
+      return await apiService.post(
+        headers: {
+          'authorization': 'Bearer ${Data.app.token}'
+        },
+        url: AppUrl.moveStart,
+        body: body,
+      );
+    }catch(e){
+      return ApiResponse(success: false,
+        error: "${e.toString()}",
+      );
+    }
+  }
+
+  Future<ApiResponse> arrived(Map<String, dynamic> body) async {
+    SharedPrefs.getUserToken();
+    print("The body Data ${body.toString()}");
+    try{
+      return await apiService.post(
+        headers: {
+          'authorization': 'Bearer ${Data.app.token}'
+        },
+        url: AppUrl.arrived,
+        body: body,
+      );
+    }catch(e){
+      return ApiResponse(success: false,
+        error: "${e.toString()}",
+      );
+    }
+  }
+
+  Future<ApiResponse> delivered(Map<String, dynamic> body) async {
+    SharedPrefs.getUserToken();
+    print("The body Data ${body.toString()}");
+    try{
+      return await apiService.post(
+        headers: {
+          'authorization': 'Bearer ${Data.app.token}'
+        },
+        url: AppUrl.delivered,
+        body: body,
+      );
+    }catch(e){
+      return ApiResponse(success: false,
+        error: "${e.toString()}",
+      );
+    }
+  }
+
 }
