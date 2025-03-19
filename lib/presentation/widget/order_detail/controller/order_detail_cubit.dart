@@ -1,8 +1,15 @@
+import 'dart:developer';
+
+import 'package:driver_app/application/DiLayer/depdency_injection.dart';
+import 'package:driver_app/application/services/ApiServices/api_services.dart';
+import 'package:driver_app/data/repositories/order_detail_repo.dart';
+import 'package:driver_app/domain/models/order_detail_model.dart';
 import 'package:driver_app/export.dart';
 
 class OrderDetailCubit extends Cubit<OrderDetailsState> {
 
   OrderDetailCubit() : super(OrderDetailsState());
+
 
   final double latitude = 37.422; // Example latitude
   final double longitude = -122.084; // Example longitude
@@ -12,6 +19,7 @@ class OrderDetailCubit extends Cubit<OrderDetailsState> {
   int currentIndex = 0;
 
   final String phoneNumber = "1234567890"; // Replace with the user's contact number
+
 
   Future<void> makePhoneCall(String number) async {
     final Uri launchUri = Uri(

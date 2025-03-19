@@ -21,7 +21,7 @@ class GetProfileCubit extends Cubit<GetProfileState> {
         GetProfileModel getProfileModel = GetProfileModel.fromJson(val.data!['data']);
         emit(GetProfileSuccess(getProfileModel: getProfileModel));
       }else{
-        emit(GetProfileError(error: "error"));
+        emit(GetProfileError(error: val.data!['errormessage'].toString()));
       }
     });
   }

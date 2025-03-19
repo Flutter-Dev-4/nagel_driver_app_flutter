@@ -30,7 +30,7 @@
   "approxTall": "Approx 7’ tall",
   "helloAswadHaider" : "Hello, Aswad Haider",
   "assignBooking": "Assign booking",
-  "arrivalBetween": "Arrival between 08 am -10 am",
+  "arrivalBetween": "Arrival between",
   "eightAugust2024": "8 Aug, 2024",
   "aqibJavid": "Aqib Javid",
   "alAkariaAlOlayah": "1st Al Akaria Al Olaya Musa Ibn Nussair Street 4th Floor, Office No. 412 A, Riyadh",
@@ -67,7 +67,7 @@
   "lastName": "Last Name",
   "orderHistory": "Order history",
   "orderID": "Order ID",
-  "status": "Delivered",
+  "status": "Status",
   "delivered": "Delivered",
   "items": "Items",
   "tenBoxes": "10 boxes, 2 sofas",
@@ -100,7 +100,19 @@
   "exit": "Exit",
   "doYuoReallyWantToExit": "Do you really want to exit?",
   "yes": "Yes",
-  "no": "No"
+  "no": "No",
+  "hello": "Hello",
+  "enterPassword": "Enter Password",
+  "enterEmail": "Enter Email",
+  "enterOldPassword": "Enter Old Password",
+  "enterNewPassword": "Enter New Password",
+  "enterConfirmPassword": "Enter Confirm Password",
+  "passwordNotMatched": "Password not matched",
+  "passwordMatched": "Password matched",
+  "invalidEmail": "Invalid Email",
+  "noOrdersFound": "No orders found",
+  "dateNotSelected": "Date not selected",
+  "addressNotMentioned": "Address not mentioned"
 
 
 }

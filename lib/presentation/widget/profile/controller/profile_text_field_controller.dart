@@ -8,5 +8,8 @@ class ProfileTextFieldController extends ChangeNotifier {
 
   TextEditingController firstNameController = TextEditingController();
   TextEditingController lastNameController = TextEditingController();
+  TextEditingController oldPassController = TextEditingController();
+  TextEditingController newPassController = TextEditingController();
+  TextEditingController confirmPassController = TextEditingController();
 
 }

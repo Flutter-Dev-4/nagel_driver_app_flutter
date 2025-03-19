@@ -47,11 +47,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                             builder: (context, state) {
                               return CircleAvatar(
                                 radius: 40.r,
-                                backgroundImage: state is GetProfileSuccess
-                                    ? NetworkImage(state
-                                        .getProfileModel.profilePic
-                                        .toString())
-                                    : AssetImage(AppImages.avatar),
+                                backgroundImage: state is GetProfileSuccess ? state.getProfileModel.profilePic != null ? NetworkImage(state.getProfileModel.profilePic.toString()) : AssetImage(AppImages.avatar) : AssetImage(AppImages.avatar),
                               );
                             },
                           ),
@@ -83,7 +79,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 70.y,
                 BlocBuilder<GetProfileCubit, GetProfileState>(
                   builder: (context, state) {
-                    ProfileTextFieldController.instance.firstNameController.text = state is GetProfileSuccess ? state.getProfileModel.name.toString() : ProfileTextFieldController.instance.firstNameController.text;
+                    ProfileTextFieldController.instance.firstNameController.text = state is GetProfileSuccess ? state.getProfileModel.firstName.toString() : ProfileTextFieldController.instance.firstNameController.text;
+                    ProfileTextFieldController.instance.lastNameController.text = state is GetProfileSuccess ? state.getProfileModel.lastName.toString() : ProfileTextFieldController.instance.lastNameController.text;
                     return Column(
                       children: [
                         PrefixTextField(
@@ -93,7 +90,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                             hintText: appLocale.firstName),
                         20.y,
                         PrefixTextField(
-                          controller: TextEditingController(),
+                          controller: ProfileTextFieldController.instance.lastNameController,
                           obscureText: false,
                           svgPath: AppImages.profile,
                           hintText: appLocale.lastName,

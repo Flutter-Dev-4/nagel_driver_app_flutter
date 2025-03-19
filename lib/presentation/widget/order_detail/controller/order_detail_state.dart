@@ -1,3 +1,4 @@
+import 'package:driver_app/domain/models/order_detail_model.dart';
 import 'package:driver_app/export.dart';
 
 // Cubit State
@@ -36,3 +37,13 @@ class OrderDetailsState {
     );
   }
 }
+final class OrderDetailLoading extends OrderDetailsState {}
+final class OrderDetailSuccess extends OrderDetailsState {
+  final OrderDetailModel orderDetail;
+  OrderDetailSuccess({required this.orderDetail});
+}
+final class OrderDetailError extends OrderDetailsState {
+  final String error;
+  OrderDetailError({required this.error});
+}
+

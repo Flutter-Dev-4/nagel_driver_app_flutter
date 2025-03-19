@@ -1,5 +1,7 @@
 class GetProfileModel {
   int? id;
+  String? firstName;
+  String? lastName;
   String? name;
   String? email;
   String? phone;
@@ -38,6 +40,8 @@ class GetProfileModel {
 
   GetProfileModel(
       {this.id,
+        this.firstName,
+        this.lastName,
         this.name,
         this.email,
         this.phone,
@@ -76,6 +80,8 @@ class GetProfileModel {
 
   GetProfileModel.fromJson(Map<String, dynamic> json) {
     id = json['id'];
+    firstName = json['firstName'];
+    lastName = json['lastName'];
     name = json['name'];
     email = json['email'];
     phone = json['phone'];
@@ -116,6 +122,8 @@ class GetProfileModel {
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     data['id'] = this.id;
+    data['firstName'] = this.firstName;
+    data['lastName'] = this.lastName;
     data['name'] = this.name;
     data['email'] = this.email;
     data['phone'] = this.phone;
