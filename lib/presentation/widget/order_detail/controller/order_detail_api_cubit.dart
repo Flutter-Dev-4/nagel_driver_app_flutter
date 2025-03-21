@@ -1,13 +1,10 @@
 import 'dart:developer';
 
-import 'package:bloc/bloc.dart';
 import 'package:driver_app/application/DiLayer/depdency_injection.dart';
 import 'package:driver_app/application/services/ApiServices/api_services.dart';
 import 'package:driver_app/data/repositories/order_detail_repo.dart';
 import 'package:driver_app/domain/models/order_detail_model.dart';
 import 'package:driver_app/export.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:meta/meta.dart';
 
 part 'order_detail_api_state.dart';
 
@@ -15,6 +12,12 @@ class OrderDetailApiCubit extends Cubit<OrderDetailApiState> {
   OrderDetailApiCubit() : super(OrderDetailApiInitial());
 
   OrderDetailRepo orderDetailRepo = OrderDetailRepo(apiService: locator<ApiServices>());
+
+  double? fromLat;
+  double? fromLong;
+  double? toLat;
+  double? toLong;
+
   Future orderDetail() async {
     emit(OrderDetailApiLoading());
     orderDetailRepo.orderDetail().then((val){
@@ -22,6 +25,14 @@ class OrderDetailApiCubit extends Cubit<OrderDetailApiState> {
       if(val.success == true){
         OrderDetailModel orderDetailModel = OrderDetailModel.fromJson(val.data!['data']);
         emit(OrderDetailApiSuccess(orderDetailModel: orderDetailModel));
+
+        fromLat = orderDetailModel.order?.expectedDestinationLatitude;
+        fromLong = orderDetailModel.order?.expectedDestinationLongitude;
+
+        toLat = orderDetailModel.order?.departureLatitude;
+        toLong = orderDetailModel.order?.departureLongitude;
+
+        log('This is latitude and Longitude \n${orderDetailModel.order?.expectedDestinationLatitude.toString()}, ${orderDetailModel.order?.expectedDestinationLongitude.toString()}');
       }else{
         emit(OrderDetailApiError(error: val.data!['errormessage'].toString()));
       }

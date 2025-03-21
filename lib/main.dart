@@ -16,17 +16,12 @@ void main() async {
   await Data.app.init();
   Dependencies().initDependency();
 
-
   SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
     DeviceOrientation.portraitDown,
   ]).then((_) {
-    runApp(
-        MultiBlocProvider(providers: appProviders,
-            child: const MyApp())
-    );
+    runApp(MultiBlocProvider(providers: appProviders, child: const MyApp()));
   });
-
 }
 
 class MyApp extends StatelessWidget {
@@ -35,37 +30,31 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<LanguageCubit, Locale>(
-            builder: (context, locale){
-              return ScreenUtilInit(
-     designSize: const Size(428, 926),
-     child: MediaQuery(
-       data: MediaQueryData.fromView(WidgetsBinding.instance.window)
-           .copyWith(textScaler: const TextScaler.linear(1.0)), // Fix text scale factor,
-       child: MaterialApp(
-         locale: locale,
-         supportedLocales: const [
-           Locale('en'),
-           Locale('ar'),
-         ],
-         localizationsDelegates: [
-           AppLocalizations.delegate,
-           GlobalMaterialLocalizations.delegate,
-           GlobalWidgetsLocalizations.delegate,
-           GlobalCupertinoLocalizations.delegate,
-         ],
-         debugShowCheckedModeBanner: false,
-         title: 'Driver App',
-         theme: ThemeData(
-           colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-           useMaterial3: true,
-         ),
-         initialRoute: RoutesNames.splash_screen,
-         onGenerateRoute: AppRoutes.generateRoute,
-       ),
-     ),
-              );
-            });
+    return BlocBuilder<LanguageCubit, Locale>(builder: (context, locale) {
+      return ScreenUtilInit(
+        designSize: const Size(428, 926),
+        child: MaterialApp(
+          locale: locale,
+          supportedLocales: const [
+            Locale('en'),
+            Locale('ar'),
+          ],
+          localizationsDelegates: [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          debugShowCheckedModeBanner: false,
+          title: 'Driver App',
+          theme: ThemeData(
+            colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+            useMaterial3: true,
+          ),
+          initialRoute: RoutesNames.splash_screen,
+          onGenerateRoute: AppRoutes.generateRoute,
+        ),
+      );
+    });
   }
 }
-

@@ -12,14 +12,177 @@ class OrderDetailsScreen extends StatefulWidget {
 }
 
 class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
+
   final double latitude = 37.422; // Example latitude
   final double longitude = -122.084; // Example longitude
-
-  final Set<Polyline> polylines = const {};
 
   int currentIndex = 0;
   final String phoneNumber =
       "1234567890"; // Replace with the user's contact number
+
+  late GoogleMapController mapController;
+  LatLng? currentLocation;
+  Set<Marker> markers = {};
+  Set<Polyline> polylines = {};
+  StreamSubscription<Position>? positionStream;
+
+  BitmapDescriptor? userLocation;
+  BitmapDescriptor? dropOff;
+
+  void setCustomIconLocation(String _imageString) {
+    BitmapDescriptor.fromAssetImage(
+      // ImageConfiguration.empty, MyImgs.pickupLocation)
+        ImageConfiguration.empty, _imageString)
+        .then((icon) {
+      setState(() {
+        userLocation = icon;
+      });
+    });
+  }
+
+  void setCustomIconDropLocation(String _imageString) {
+    BitmapDescriptor.fromAssetImage(
+      // ImageConfiguration.empty, MyImgs.pickupLocation)
+        ImageConfiguration.empty, _imageString)
+        .then((icon) {
+      setState(() {
+        dropOff = icon;
+      });
+    });
+  }
+
+  Future<void> _requestLocationPermission() async {
+    LocationPermission permission = await Geolocator.requestPermission();
+    if (permission == LocationPermission.denied || permission == LocationPermission.deniedForever) {
+      // Handle permission denied case
+      print("Location permission denied");
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    context.read<OrderDetailApiCubit>().orderDetail();
+
+    _requestLocationPermission();
+    _getCurrentLocation();
+    setCustomIconLocation(AppImages.currentLocation);
+    setCustomIconDropLocation(AppImages.destinationLocation);
+  }
+
+  /// Get the current location of the user
+  Future<void> _getCurrentLocation() async {
+
+    final cubit = context.read<OrderDetailApiCubit>();
+
+    Position position = await Geolocator.getCurrentPosition(
+      desiredAccuracy: LocationAccuracy.high,
+    );
+    setState(() {
+      currentLocation = LatLng(cubit.fromLat!, cubit.fromLong!);
+      markers.add(
+        Marker(
+          markerId: MarkerId("current"),
+          icon: userLocation == null ? BitmapDescriptor.defaultMarker : userLocation!,
+          position: LatLng(cubit.fromLat!, cubit.fromLong!),
+          infoWindow: InfoWindow(title: "Current Location"),
+        ),
+      );
+    });
+    _getDirections(); // Fetch route once location is available
+  }
+
+  /// Fetch route between current location and destination
+  Future<void> _getDirections() async {
+
+    final cubit = context.read<OrderDetailApiCubit>();
+
+    if (currentLocation == null) return;
+
+    PolylinePoints polylinePoints = PolylinePoints();
+    PolylineResult result = await polylinePoints.getRouteBetweenCoordinates(
+      googleApiKey: "AIzaSyBa7gpIFsqCjngZdpif0HPOSJBP1mQ_ty8",
+      request: PolylineRequest(origin: PointLatLng(currentLocation!.latitude, currentLocation!.longitude), destination: PointLatLng(cubit.toLat!, cubit.toLong!), mode: TravelMode.driving),
+    );
+
+    if (result.points.isNotEmpty) {
+      List<LatLng> polylineCoordinates = result.points
+          .map((point) => LatLng(point.latitude, point.longitude))
+          .toList();
+
+      setState(() {
+        polylines.add(Polyline(
+          polylineId: PolylineId("route"),
+          points: polylineCoordinates,
+          color: Colors.black,
+          width: 5,
+        ));
+        markers.add(
+          Marker(
+            markerId: MarkerId("destination"),
+            icon: dropOff == null ? BitmapDescriptor.defaultMarker : dropOff!,
+            position: LatLng(cubit.toLat!, cubit.toLong!),
+            infoWindow: InfoWindow(title: "Destination"),
+          ),
+        );
+      });
+    }
+  }
+
+  /// Start real-time tracking when driver presses "Start Move"
+  void _startTracking() {
+
+    final cubit = context.read<OrderDetailApiCubit>();
+
+    positionStream = Geolocator.getPositionStream(
+      locationSettings: LocationSettings(accuracy: LocationAccuracy.high),
+    ).listen((Position position) {
+      setState(() {
+        currentLocation = LatLng(cubit.fromLat!, cubit.fromLong!);
+        markers.removeWhere((m) => m.markerId.value == "current");
+        markers.add(
+          Marker(
+            markerId: MarkerId("current"),
+            position: LatLng(cubit.fromLat!, cubit.fromLong!),
+            infoWindow: InfoWindow(title: "Current Location"),
+          ),
+        );
+
+        // Center the camera on the updated location
+        mapController.animateCamera(
+          CameraUpdate.newLatLng(currentLocation!),
+        );
+
+        // Check if reached destination
+        if (_checkIfArrived()) {
+          positionStream?.cancel();
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text("You have arrived at your destination!")),
+          );
+        }
+      });
+    });
+  }
+
+  /// Check if the driver reached the destination
+  bool _checkIfArrived() {
+
+    final cubit = context.read<OrderDetailApiCubit>();
+
+    double distance = Geolocator.distanceBetween(
+      cubit.fromLat!,
+      cubit.fromLong!,
+      cubit.toLat!,
+      cubit.toLong!,
+    );
+    return distance < 10; // Stop tracking if within 10 meters
+  }
+
+  @override
+  void dispose() {
+    positionStream?.cancel();
+    super.dispose();
+  }
 
   Future<void> _makePhoneCall(String number) async {
     final Uri launchUri = Uri(
@@ -46,21 +209,10 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
     }
   }
 
-  @override
-  void initState() {
-    super.initState();
-    context.read<OrderDetailApiCubit>().orderDetail();
-    context.read<OrderDetailCubit>().fetchLocation();
-    context
-        .read<OrderDetailCubit>()
-        .setCustomCurrentLocation(AppImages.currentLocation);
-    context
-        .read<OrderDetailCubit>()
-        .setCustomDestinationLocation(AppImages.destinationLocation);
-  }
 
   @override
   Widget build(BuildContext context) {
+
     final appLocale = AppLocalizations.of(context);
 
     return BlocBuilder<OrderDetailCubit, OrderDetailsState>(
@@ -87,38 +239,25 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
               children: [
                 BlocBuilder<OrderDetailApiCubit, OrderDetailApiState>(
                   builder: (context, state) {
+
+                    final cubit = context.read<OrderDetailApiCubit>();
+
                     return SizedBox(
                   height: 370.h,
                   child: state is OrderDetailApiSuccess
+                      ? cubit.fromLat != null
+                      || cubit.fromLong != null
                       ? GoogleMap(
-                    zoomControlsEnabled: false,
                     initialCameraPosition: CameraPosition(
-                      target: LatLng(state.orderDetailModel.order?.expectedDestinationLatitude != null ? state.orderDetailModel.order?.expectedDestinationLatitude :  0.0, state.orderDetailModel.order?.expectedDestinationLongitude != null ? state.orderDetailModel.order?.expectedDestinationLongitude : 0.0),
-                      zoom: 12.0,
+                      target: LatLng(cubit.fromLat!, cubit.fromLong!),
+                      zoom: 7,
                     ),
-                    markers: {
-                      Marker(
-                        markerId: MarkerId("currentLocation"),
-                        position: LatLng(state.orderDetailModel.order?.expectedDestinationLatitude != null ? state.orderDetailModel.order?.expectedDestinationLatitude :  0.0, state.orderDetailModel.order?.expectedDestinationLongitude != null ? state.orderDetailModel.order?.expectedDestinationLongitude : 0.0),
-                        infoWindow: InfoWindow(title: "Current Location"),
-                        icon: cubit.currentIcon == null
-                            ? BitmapDescriptor.defaultMarker
-                            : cubit.currentIcon!,
-                      ),
-                        Marker(
-                          markerId: MarkerId("destination"),
-                          position: LatLng(state.orderDetailModel.order?.departureLatitude != null ? state.orderDetailModel.order?.departureLatitude :  0.0, state.orderDetailModel.order?.departureLongitude != null ? state.orderDetailModel.order?.departureLongitude : 0.0),
-                          infoWindow: InfoWindow(title: "Destination"),
-                          icon: cubit.destinationIcon == null
-                              ? BitmapDescriptor.defaultMarker
-                              : cubit.destinationIcon!,
-                        ),
+                    markers: markers,
+                    polylines: polylines,
+                    onMapCreated: (GoogleMapController controller) {
+                      mapController = controller;
                     },
-                    polylines: state.polylines,
-                    onMapCreated: (controller) => context
-                        .read<OrderDetailCubit>()
-                        .mapController = controller,
-                  )
+                  ) : Center(child: CircularProgressIndicator())
                       : Center(child: CircularProgressIndicator()),
                 );
   },
@@ -313,6 +452,7 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
                                     context: context,
                                     builder: (context) {
 
+                                      final cubit = context.read<OrderDetailApiCubit>();
                                       final orderId = state is OrderDetailApiSuccess ? state.orderDetailModel.order!.assignment!.orderId : 0;
                                       final latitude = state is OrderDetailApiSuccess ? state.orderDetailModel.order!.expectedDestinationLatitude : 0.0;
                                       final longitude = state is OrderDetailApiSuccess ? state.orderDetailModel.order!.expectedDestinationLongitude : 0.0;
@@ -337,7 +477,8 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
                                           return StatesDialogueConfirm(
                                         title: currentIndex == 0 ? appLocale.moveStarted : appLocale.markArrived,
                                         onPress: () {
-                                          context.read<MoveStartCubit>().moveStart(orderId!, latitude, longitude);
+                                          context.read<MoveStartCubit>().moveStart(orderId!, cubit.fromLat!, cubit.fromLong!);
+                                          _startTracking();
                                         },
                                       );
                                         },
